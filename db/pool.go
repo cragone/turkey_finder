@@ -2,8 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
-	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,12 +11,7 @@ type Database struct {
 	Pool *pgxpool.Pool
 }
 
-func New(ctx context.Context) (*Database, error) {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		return nil, errors.New("DATABASE_URL is not provided")
-	}
-
+func New(ctx context.Context, dsn string) (*Database, error) {
 	cfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
 		return nil, err
