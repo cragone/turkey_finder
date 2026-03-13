@@ -2,7 +2,9 @@ package main
 
 import (
 	"char/db"
+	"char/scoring"
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -25,5 +27,14 @@ func main() {
 		panic(err)
 	}
 
-	_ = appConn
+	newYork, err := scoring.ListParcels(context.Background(), appConn.Pool)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	newYork.ReturnParcelsWithScore()
+
+	for _, p := range newYork.Land {
+		fmt.Printf("Score: %f | %s | %.1f acres\n", p.Score, p.Name, p.Acres)
+	}
 }
