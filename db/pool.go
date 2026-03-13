@@ -21,6 +21,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	cfg.MinConns = 2
 	cfg.MaxConnLifetime = time.Hour
 	cfg.MaxConnIdleTime = 15 * time.Minute
+
 	cfg.HealthCheckPeriod = time.Minute
 
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
