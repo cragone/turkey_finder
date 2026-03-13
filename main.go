@@ -12,8 +12,5 @@ func main() {
 		log.Println("no .env file found, using system env")
 	}
 
-	log.Println("env loaded")
-}
-		log.Fatal(err)
-	}
+
 }
