@@ -12,20 +12,20 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Panic("no .env file found, using system env")
+	if err := godotenv.Load(); err != nil {
+		log.Println("no .env file found, using system env")
 	}
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		log.Panic("no database url found")
+		log.Fatal("DATABASE_URL env var is required")
 	}
 
 	appConn, err := db.New(context.Background(), dsn)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
+	defer appConn.Close()
 
 	newYork, err := scoring.ListParcels(context.Background(), appConn.Pool)
 	if err != nil {
@@ -34,7 +34,19 @@ func main() {
 
 	newYork.ReturnParcelsWithScore()
 
+	fmt.Printf("%-6s  %-50s  %8s  %8s  %7s  %9s  %8s  %5s\n",
+		"Score", "Name", "Acres", "ElevσM", "Forest%", "Water(m)", "Sightings", "")
+	fmt.Println("------  --------------------------------------------------  --------  --------  -------  ---------  ---------")
+
 	for _, p := range newYork.Land {
-		fmt.Printf("Score: %f | %s | %.1f acres\n", p.Score, p.Name, p.Acres)
+		fmt.Printf("%6.1f  %-50s  %8.1f  %8.1f  %6.1f%%  %9.0f  %9d\n",
+			p.Score,
+			p.Name,
+			p.Acres,
+			p.ElevStdDev,
+			p.ForestPct*100,
+			p.WaterDistMeters,
+			p.SightingCount,
+		)
 	}
 }
